@@ -37,5 +37,14 @@ createApp() 함수가 실행되면서 App.vue 파일을 가져오면서 인스�
 **index.js** <br/>
 라우팅을 위한 경로 객체(routes)를 선언한 곳. 
 
+<br/>
+
+-------
+### this 정리
+- 함수 외부 this : Window
+- 함수 내부 this : Window
+- 생성자 함수 내부 this : Vue component
+- 비동기 함수 내부 this : 함수가 호출되는 위치에서 벗어난 this
+- 화살표 함수 내부 this : 함수가 호출되는 위치의 this
 
 
