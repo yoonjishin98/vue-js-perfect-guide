@@ -1,14 +1,11 @@
 <template>
-  <div
+  <p
     v-for="item in askItems"
     :key="item"
   >
-    <!-- <div
-    v-for="item in ask"
-    :key="item"
-  > -->
-    {{ item.title }}
-  </div>
+    <a :href="item.url">{{ item.title }}</a>
+    <small>{{ item.time_ago }} by {{ item.user }}</small>
+  </p>
 </template>
 
 <script>
@@ -16,11 +13,6 @@ import { fetchAskList } from '../api/index.js'
 import { mapState, mapGetters } from 'vuex'
 
 export default {
-  // data() {
-  //   return {
-  //     ask: []
-  //   }
-  // },
   computed: {
     // #2 (#1을 더 사용하기 편하게 보완) - mapGetters의 배열 표기법
     ...mapGetters({

@@ -1,10 +1,17 @@
 <template>
-  <div
+  <!-- <div
     v-for="job in $store.state.jobs"
     :key="job"
   >
     {{ job.title }}
-  </div>
+  </div> -->
+  <p
+    v-for="job in $store.state.jobs"
+    :key="job"
+  >
+    <a :href="job.url">{{ job.title }}</a>
+    <small>{{ job.time_ago }} by {{ job.domain }}</small>
+  </p>
 </template>
 
 <script>
