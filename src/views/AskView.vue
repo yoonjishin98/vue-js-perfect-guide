@@ -3,8 +3,13 @@
     v-for="item in askItems"
     :key="item"
   >
-    <a :href="item.url">{{ item.title }}</a>
-    <small>{{ item.time_ago }} by {{ item.user }}</small>
+    <router-link :to="`/item/${item.id}`">
+      {{ item.title }}
+    </router-link>
+    <small>
+      {{ item.time_ago }} by 
+      <router-link :to="`/user/${item.user}`">{{ item.user }}</router-link>
+    </small>
   </p>
 </template>
 

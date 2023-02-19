@@ -9,12 +9,17 @@ const store = createStore({
         return {
             news: [],
             jobs: [],
-            ask: []
+            ask: [],
+            user: [],
+            item: []
         }
     },
     getters: {  // store의 computed
         fetchedAsk(state) {
             return state.ask
+        },
+        fetchedItem(state) {
+            return state.item
         }
     },
     actions,    // actions: actions,
