@@ -1,9 +1,9 @@
-import { createRouter, createWebHistory } from "vue-router";
-import NewsView from '../views/NewsView.vue';
-import AskView from '../views/AskView.vue';
-import JobsView from '../views/JobsView.vue';
-import ItemView from '../views/ItemView.vue';
-import UserView from '../views/UserView.vue';
+import { createRouter, createWebHistory } from "vue-router"
+import NewsView from '../views/NewsView.vue'
+import AskView from '../views/AskView.vue'
+import JobsView from '../views/JobsView.vue'
+import ItemView from '../views/ItemView.vue'
+import UserView from '../views/UserView.vue'
 
 const routes = [
     {
@@ -37,6 +37,6 @@ const routes = [
 const router = createRouter({
     history: createWebHistory(),
     routes
-});
+})
 
-export default router;
+export default router

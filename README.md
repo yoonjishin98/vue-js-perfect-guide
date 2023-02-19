@@ -3,13 +3,14 @@
 
 <br/>
 
+## <span style="color:#8FEB99">Vue Framework</span>
 ### Vue 버전에 대한 이해
 ### - Vue CLI 2.X vs Vue CLI 3.X
 1.  명령어
     - 2.X : ```vue init {프로젝트 템플릿 이름} {파일 위치}```
     - 3.X : ```vue create {프로젝트 이름}```
 
-2. *<span style="color:skyblue">Webpack</span>* 설정 파일
+2. *<span style="color:grey">Webpack</span>* 설정 파일
     - 2.X : 노출 o 
     - 3.X : 노출 x 
         - Webpack 설정 위해서 별도 설정 추가 필요
@@ -40,6 +41,7 @@ createApp() 함수가 실행되면서 App.vue 파일을 가져오면서 인스�
 <br/>
 
 -------
+## <span style="color:#8FEB99">JavaScript</span>
 ### this 정리
 - 함수 외부 this : Window
 - 함수 내부 this : Window
@@ -47,4 +49,22 @@ createApp() 함수가 실행되면서 App.vue 파일을 가져오면서 인스�
 - 비동기 함수 내부 this : 함수가 호출되는 위치에서 벗어난 this
 - 화살표 함수 내부 this : 함수가 호출되는 위치의 this
 
+<br/>
 
+### Destructing (ES6 문법)
+간단히 정리하자면, 기존의 변수 선언 문법을 destruct하여 값을 편하게 꺼내올 수 있도록 변형한 문법 
+```javascript
+// 기존 변수 선언 문법
+var obj = {
+  a: 10,
+  b: 20,
+  c: 30
+};
+
+// Destructing 문법
+var {a,b,c} = obj;
+
+console.log(a); // 10
+```
+
+- 참고 : https://joshua1988.github.io/es6-online-book/destructuring.html#%EB%B7%B0%EC%97%91%EC%8A%A4%EC%97%90-%EC%A0%81%EC%9A%A9%ED%95%98%EB%8A%94-%EA%B5%AC%EC%A1%B0-%EB%B6%84%ED%95%B4-%EB%AC%B8%EB%B2%95-1
