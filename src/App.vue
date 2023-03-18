@@ -31,6 +31,20 @@ export default {
   margin: 0;
 }
 
+a {
+  color: #34495e;
+  text-decoration: none;
+}
+
+a:hover {
+  color:#42b883;
+  text-decoration: underline;
+}
+
+a.router-link-exact-active {
+  text-decoration: underline;
+}
+
 /* 라우터 트랜지션 */
 .page-enter-active,
 .page-leave-active {

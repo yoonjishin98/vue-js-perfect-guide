@@ -1,35 +1,16 @@
 <template>
   <div>
-    <p
-      v-for="item in $store.state.news"
-      :key="item"
-    >
-      <a :href="item.url">{{ item.title }}</a>
-      <small>{{ item.time_ago }} by 
-        <router-link :to="`/user/${item.user}`">{{ item.user }}</router-link>
-      </small>
-    </p>
+    <list-item />
   </div>
 </template>
 
 <script>
-import { fetchNewsList } from '../api/index.js'
+import ListItem from '@/components/ListItem.vue'
 
 export default {
-  // data() {
-  //   return {
-  //     users:[]
-  //   }
-  // },
-  created() {
-    this.$store.dispatch('FETCH_NEWS')
-
-    // fetchNewsList()
-    //   .then(response => {
-    //     this.users = response.data
-    //   })
-    //   .catch(err => console.log(err))
-  }
+    components: {
+        ListItem
+    }
 }
 </script>
 
