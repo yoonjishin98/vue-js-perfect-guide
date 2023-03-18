@@ -33,7 +33,10 @@
             >
               {{ item.user }}
             </router-link>
-            <a :href="item.url"> {{ item.domain }} </a>
+            <a
+              v-else
+              :href="item.url"
+            > {{ item.domain }} </a>
           </small>
         </div>
       </li>

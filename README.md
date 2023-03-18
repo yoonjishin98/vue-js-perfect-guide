@@ -3,8 +3,8 @@
 
 <br/>
 
-## <span style="color:#8FEB99">Vue Framework</span>
-### <span style="color:#8FEB99"> ⦿ Vue 버전에 대한 이해 </span>
+## Vue Framework
+### 🔷 Vue 버전에 대한 이해
 ### - Vue CLI 2.X vs Vue CLI 3.X
 1.  명령어
     - 2.X : ```vue init {프로젝트 템플릿 이름} {파일 위치}```
@@ -30,7 +30,7 @@
 <br/>
 <br/>
 
-### <span style="color:#8FEB99"> ⦿ 프로젝트 파일에 대한 이해 </span>
+### 🔷 프로젝트 파일에 대한 이해 
 **main.js** <br/>
 프로젝트를 빌드했을 때, 가장 먼저 실행되는 자바스크립트 파일. <br/>
 createApp() 함수가 실행되면서 App.vue 파일을 가져오면서 인스턴스를 생성하고 이를 index.html의 id="app"에 mount되는 식으로 동작.
@@ -40,7 +40,7 @@ createApp() 함수가 실행되면서 App.vue 파일을 가져오면서 인스�
 
 <br/>
 
-### <span style="color:#8FEB99"> ⦿ Vuex </span>
+### 🔷 Vuex 
 Vue.js 애플리케이션의 상태 관리 패턴 라이브러리. 애플리케이션의 모든 컴포넌트에 대해 중앙집중식 저장소 역할 수행. 저장소 내부에서 상태 변경 가능. <br/>
 * state: 저장되는 값
 * Actions: 
@@ -48,9 +48,20 @@ Vue.js 애플리케이션의 상태 관리 패턴 라이브러리. 애플리케�
 * State: 
 <img src = "https://v3.vuex.vuejs.org/vuex.png" width="600">
 
+<br/>
+
+### 🔷 공통 컴포넌트 생성 방법 2가지 (feat. Vuex)
+[상황]  <br/>
+User view (유저 정보 표시 페이지)와 User profile (유저 정보 표시 컴포넌트)가 존재하며, 유저 정보는 api call을 통해 불러옴 <br/>
+1. api call을 화면 단 (User view) 에서 실행 후, props를 통해 User profile로 내려주기 
+2. api call을 컴포넌트 (User profile)에서 실행
+
+
+<br/>
+
 -------
-## <span style="color:#8FEB99">JavaScript</span>
-### <span style="color:#8FEB99"> this 정리 </span>
+## JavaScript
+### 🔷 this 정리
 - 함수 외부 this : Window
 - 함수 내부 this : Window
 - 생성자 함수 내부 this : Vue component
@@ -59,7 +70,7 @@ Vue.js 애플리케이션의 상태 관리 패턴 라이브러리. 애플리케�
 
 <br/>
 
-### <span style="color:#8FEB99"> Destructing (ES6 문법) </span>
+### 🔷 Destructing (ES6 문법) 
 간단히 정리하자면, 기존의 변수 선언 문법을 destruct하여 값을 편하게 꺼내올 수 있도록 변형한 문법 
 ```javascript
 // 기존 변수 선언 문법
