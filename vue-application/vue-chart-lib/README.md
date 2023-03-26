@@ -1,4 +1,4 @@
-# vue-news
+# vue-chart-lib
 
 ## Project setup
 ```
