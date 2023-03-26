@@ -4,18 +4,43 @@
     <transition name="page">
       <router-view />
     </transition>
+    <loading-spinner :loading="loadingStatus" />
   </div>
 </template>
 
 <script>
-// import HelloWorld from './components/HelloWorld.vue'
+import LoadingSpinner from './components/LoadingSpinner.vue'
 import ToolBar from './components/ToolBar.vue'
 
 export default {
   name: 'App',
   components: {
-    //HelloWorld, 
-    ToolBar
+    ToolBar,
+    LoadingSpinner
+  },
+  data() {
+    return {
+      loadingStatus: false,
+    }
+  },
+  created() {
+    /* EventBus: 데이터 받기 */
+    // eventBus.$on('start:spinner', this.startSpinner)   --Vue 2 버전
+    this.$emitter.on("start:spinner", this.startSpinner)
+    // eventBus.$on('end:spinner', this.endSpinner)   --Vue 2 버전
+    this.$emitter.on("end:spinner", this.endSpinner)
+  },
+  beforeUnmount() {   // == beforeDestroy 
+    this.$emitter.off("start:spinner", this.startSpinner)
+    this.$emitter.off("end:spinner", this.endSpinner)
+  },
+  methods: {
+    startSpinner() {
+      this.loadingStatus = true
+    },
+    endSpinner() {
+      this.loadingStatus = false
+    }
   }
 }
 </script>

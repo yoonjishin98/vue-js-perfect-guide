@@ -11,7 +11,8 @@ const store = createStore({
             jobs: [],
             ask: [],
             user: [],
-            item: []
+            item: [],
+            list: []
         }
     },
     getters: {  // store의 computed
