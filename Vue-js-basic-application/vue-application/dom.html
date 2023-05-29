@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div ref='app' id='app'>hello</div>
+
+  <script>
+    // 모두 동일
+    var divElement = document.getElementById('app') // 화면에 그려지는 모든 DOM에 접근하기 때문에 충돌날 확률이 높음
+    divElement = document.querySelector('#app')
+    divElement = $('#app')  // jquery
+    divElement = this.$refs.app // vue. $refs의 이점 - template 내부만 접근하기 때문에 충돌 방지 가능
+  </script> 
+</body>
+</html>
