@@ -6,7 +6,7 @@
 
 ## Vue Framework
 ### 🔷 Vue 버전에 대한 이해
-### - Vue CLI 2.X vs Vue CLI 3.X
+-Vue 2 vs Vue 3
 1.  명령어
     - 2.X : ```vue init {프로젝트 템플릿 이름} {파일 위치}```
     - 3.X : ```vue create {프로젝트 이름}```
@@ -25,8 +25,8 @@
         - 프로젝트 생성 이후에도 ```vue add {플러그인 이름}```을 통해 플러그인 추가 가능
 
 4. ES6 이해도
-    - 2.X : 필요 o 
-    - 3.X : 필요 x 
+    - 2.X : 필요 x
+    - 3.X : 필요 o 
 
 <br/>
 <br/>
@@ -55,13 +55,356 @@ app.use(router)
 <br/>
 
 ### 🔷 Vuex 
-Vue.js 애플리케이션의 상태 관리 패턴 라이브러리. 애플리케이션의 모든 컴포넌트에 대해 중앙집중식 저장소 역할 수행. 저장소 내부에서 상태 변경 가능. <br/>
-* state: 저장되는 값
-* Actions: 
-* Mutations: Vuex의 데이터(state 값)을 변경하는 로직
-* State: 
-<br/>
+- Vue.js 애플리케이션의 상태(data) 관리 패턴 라이브러리. 애플리케이션의 모든 컴포넌트에 대해 중앙집중식 저장소 역할 수행. 쉽게 말해 data를 전역으로 사용하는 것이라고 보면 됨.
+- Vuex는 총 다섯 개의 컨셉이 있음.
 <img src = "https://v3.vuex.vuejs.org/vuex.png" width="600">
+<br/>
+
+#### ➿ **State**
+State(상태)의 집합.  <br/>
+단일 상태 트리를 사용. 즉 App 1개 당 1개의 store만 갖고 있으며, State에 있는 state들은 복수의 컴포넌트에서 사용되어도 동일한 상태가 유지됨. 따라서 현재 state의 상태(snapshot)을 찾기 쉬움. <br/>
+* **mapState** <br/>
+    - 사용 이유: computed 속성을 통해 store의 state 값이 변경될 때마다 그 값을 화면에 출력하도록 할 수 있는데, computed에 선언된 state가 많으면 코드가 반복적이게 될 수 있음. 이런 불필요한 반복을 처리하기 위해 mapState helper를 이용함.
+    - 예시 <br/>
+    ```$store.state.count``` 의 변경된 값을 감지하고 싶을 때
+    
+        ```javascript
+        import { mapState } from 'vuex'
+
+        export default {
+        
+            computed: mapState({
+                // 화살표 함수
+                count: state => state.count,
+
+                // 문자열 값 'count'은 `state => state.count` 동일
+                countAlias: 'count',
+
+                // `this`를 사용하여 로컬 상태에 액세스하려면 일반적인 메소드를 사용
+                countPlusLocalState (state) {
+                    return state.count + this.localCount
+                }
+            })
+        }
+        ```
+    - **Object Spread Operator**
+        - 사용 이유: 로컬 영역의 computed 속성과 함께 사용하기 위해 
+        - 예시
+        ```javaScript
+        computed: {
+            localComputed () { /* ... */ },  // (vuex를 활용하지 않는) 로컬 영역의 computed 
+            ...mapState({
+                // ...
+            })
+        }
+        ```
+
+#### ➿ **Actions**
+store 내부의 계산 속성. <br/> 
+각각의 컴포넌트에서 state를 계산하면 반복 호출이 잦아져 비효율적인 로직이 됨. 따라서 store 내부에서 계산을 진행하고, 각 컴포넌트에서는 state만 호출하도록 하는 것.
+- ```this.$store.getters.{getter명}```의 형태로 활용
+- 예시
+    - store 내부
+    ```javascript
+    export const store = new Vuex.Store({
+        state: {
+            count: 0
+        },
+        getters: { 
+            increaseCount(state) {
+                return state.count+1
+            },
+            // getter를 반환하는 것도 가능
+            multiplyCount(state) {
+                return getters.getCurCount*2
+            },
+            // 함수를 반환하는 것도 가능
+            decreaseCount: (state) => (num) => { 
+                return state.count-num
+            },
+            // 동일한 함수
+            // decreaseCount: (function(state) {
+                // return function(num) {
+                    // return state.count-1
+                // }
+            // })
+        }
+    })
+    ```
+    - 컴포넌트 내부
+    ```javaScript
+    export default {
+        computed: {
+            increaseCount () {
+                return this.$store.getters.increaseCount
+            },
+            // getter를 반환하는 경우
+            multiplyCount () {
+                return this.$store.getters.multiplyCount
+            },
+            // 함수가 반환되는 경우
+            decreaseCount () {
+                return this.$store.getters.increaseCount(1)
+            },
+        }
+    }
+    ```
+- **mapGetters** <br/>
+mapState와 동일하게 코드의 반복을 막기 위해 mapGetters 사용하며, 로컬 computed 속성들과 함께 사용하고 싶다면 spread operator를 사용하면 됨.
+    ```javascript
+    computed: {
+        ...mapGetters([
+        'increaseCount',
+        'anotherGetter',
+         count: 'decreaseCount' // this.count에 $store.getters.decreaseCount를 매핑하는 경우
+        // ...
+        ])
+    }
+    ```
+
+#### ➿ **Mutations**
+Vuex 내부의 state의 값을 _동기적으로_ 변경할 때 사용 <br/>
+(비동기적인 변이: Actions) <br/>
+⟶ 동기적: 해당 mutation이 호출되는 시점에 바로 실행되어야 함. API 콜과 같은 비동기 작업은 여러 컴포넌트에서 동시다발적으로 일어나면 현재 state를 추적할 수 없기 때문에 안됨.
+
+* 각 컴포넌트에서 store.commit을 통해 mutation handler를 호출하여 사용
+    - commit을 통해 state의 추적이 가능하게 함
+    - payload(전달 인자)가 없는 경우
+        - store 내부
+        ```javaScript
+            const store = new Vuex.Store({
+                state: {
+                    count: 1
+                },
+                mutations: {
+                    increment (state) {
+                        state.count++
+                    }
+                }
+            })
+        ```
+        - 컴포넌트 내부
+        ```javaScript
+        export default {
+            computed: {
+                count () {
+                    return this.$store.state.count
+                }
+            },
+            methods: {
+                increment() {
+                    this.$store.commit('increment')
+                }
+            }
+        }
+        ```
+    - payload가 있는 경우
+        - payload는 여러 field를 가질 수 있도록 객체의 형태를 갖는 것이 좋음
+        - store 내부
+        ```javaScript
+        // ...
+        mutations: {
+            increment (state, n) {
+                state.count += n
+            }
+        }   
+        ```
+        - 컴포넌트 내부
+         ```javaScript
+        store.commit('increment', {
+            amount: 10
+        })  
+        ```
+        ```javaScript
+        // 객체의 type을 지정하여 commit도 가능
+        store.commit({
+            type: 'increment',
+            amount: 10
+        })  
+        ```
+- **mapMutations** <br/>
+    - mapState, mapGetters와 같이 mutations를 간단히 사용할 수 있음
+    - 차이점: methods에 정의
+    ```javaScript
+    import { mapMutations } from 'vuex'
+
+    export default {
+    // ...
+    methods: {
+        // 로컬 데이터명과 mutations 메소드 명이 동일할 때
+        // this.increment = this.$store.commit('increment')
+        ...mapMutations([
+            'increment' 
+        ]),
+        // 로컬 데이터명과 mutations 메소드 명이 다를 때
+        // this.add() = this.$store.commit('increment')
+        ...mapMutations({
+            add: 'increment' 
+        })
+    }
+    ```
+- Mutation 메소드 명을 상수로 사용하기
+    - 개발자가 많은 대규모 프로젝트에서 유용하며, 모든 상수를 하나의 파일에 모아놓으면 어플리케이션에서 어떤 변이가 가능한지 한 눈에 파악할 수 있어서 편리함.
+        - mutation-types.js
+            ```javaScript
+            export const SOME_MUTATION = 'SOME_MUTATION'
+            ```
+        - store.js
+            ```javaScript
+            import Vuex from 'vuex'
+            import { SOME_MUTATION } from './mutation-types'
+
+            const store = new Vuex.Store({
+                state: { ... },
+                mutations: {
+                    // (ES2015의 computed property name을 사용)
+                    // 상수를 함수 이름으로 사용 가능
+                    [SOME_MUTATION] (state) { ... }
+                }
+            })
+            ```
+
+#### ➿ **Actions**
+Vuex 내부의 state의 값을 _비동기적으로_ 변경할 때 사용<br/>
+그러나 mutations와 같이 state 값을 직접적으로 변경하는 게 아니라 **mutations의 메소드를 호출 후 commit을 통해 변경함.**
+* 사용 영역: setTimeout() 혹은 서버와의 http 통신 등
+* Store 내부에서 actions 내부에 mutations에 정의한 메소드를 commit을 통해 호출하여 구현함
+    ```javaScript
+    const store = new Vuex.Store({
+        state: {
+            count: 0
+        },
+        mutations: {
+            increment (state) {
+                state.count++
+            }
+        },
+        actions: {
+            increment (context) {
+                context.commit('increment')
+            }
+        }
+    })
+    ```
+    * context? <br/>
+    actions 핸들러의 파라미터로, 다음의 프로퍼티들을 갖는 객체
+        ```
+        {
+            state,      // same as `store.state`, or local state if in modules
+            rootState,  // same as `store.state`, only in modules
+            commit,     // same as `store.commit`
+            dispatch,   // same as `store.dispatch`
+            getters,    // same as `store.getters`, or local getters if in modules
+            rootGetters // same as `store.getters`, only in modules
+        }
+        ```
+        * 객체이기 때문에 commit을 여러번 호출해야 하면 ES6의 Destructing 문법 사용 가능. commit을 여러번 사용해야 하는 경우 유용. 
+            ```javaScript
+            actions: {
+                increment ({ commit }) { // Destructing 문법을 사용하여 context 객체 내부의 commit 함수를 별도 추출하는 것
+                    commit('increment') // 추출한 commit 함수 사용
+                    commit('anotherIncrement')
+                }
+            }
+            ```
+* Component 내부에서는 ```store.dispatch('increment')``` 와 같은 형태로 호출하여 사용
+    * Store 내부
+        ```javaScript
+        incrementAsync ({ commit }) {
+            setTimeout(() => {
+                commit('increment')
+            }, 1000)
+        }
+        ```
+    * Component 내부
+        ```javaScript
+        methods: {
+            increaseCnt() {
+                this.$store.dispatch('incrementAsync');
+            }
+        }
+        ```
+        * 동일하게 payload를 활용할 수 있고, 타입을 지정하여 dispatch 할 수 있음
+            ```javaScript
+            // 페이로드와 함께 디스패치
+            store.dispatch('incrementAsync', {
+                amount: 10
+            })
+
+            // 객체와 함께 디스패치
+            store.dispatch({
+                type: 'incrementAsync',
+                amount: 10
+            })
+            ```
+
+* 액션 내의 비동기 로직 사용 가능 <br/>
+```store.dispatch```는 action 핸들러가 반환한 promise를 처리할 수 있으며, promise를 반환
+    * store 내부
+        ```javaScript
+        actions: {
+            actionA ({ commit }) {
+                return new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                        commit('someMutation')
+                        resolve()
+                    }, 1000)
+                })
+            },
+            // 다음과 같이 사용하는 것도 가능
+            actionB ({ dispatch, commit }) {
+                return dispatch('actionA').then(() => {
+                    commit('someOtherMutation')
+                })
+            }
+        }
+        ```
+    * 컴포넌트 내부
+        ```javaScript
+        store.dispatch('actionB').then(() => {
+            // ...
+        })
+        ```
+
+* 액션 내의 비동기 로직 사용 가능 - async/await <br/>
+    ```javaScript
+    actions: {
+        async actionA ({ commit }) {
+            commit('gotData', await getData())
+        },
+        async actionB ({ dispatch, commit }) {
+            await dispatch('actionA')
+            commit ('gotOtherData', await getOtherData())
+        }
+    }
+    ```
+
+* **mapActions** <br/>
+```this.$store.dispatch('xxx')``` 반복을 막기 위해 동일하게 헬퍼 제공
+    ```javaScript
+    import { mapActions } from 'vuex'
+
+    export default {
+        // ...
+        methods: {
+            ...mapActions([
+                'increment' // this.increment()를 this.$store.dispatch('increment')에 매핑
+
+                // mapActions는 페이로드를 지원
+                'incrementBy' // this.incrementBy(amount)를 this.$store.dispatch('incrementBy', amount)에 매핑
+            ]),
+            ...mapActions({
+                add: 'increment' // this.add()을 this.$store.dispatch('increment')에 매핑
+            })
+        }
+    }
+    ```
+
+#### ➿ **Modules**
+
+<br/>
+
+❗️ Vuex는 새로고침 시 초기화 됨. 그러나 vuex-persistedstate (state - localstorage 동기화 라이브러리) 사용 시 브라우저의 local storage에 저장되어 새로고침해도 초기화되지 않음.
 
 <br/>
 
@@ -74,7 +417,7 @@ User view (유저 정보 표시 페이지)와 User profile (유저 정보 표시
 <br/>
 
 ### 🔷 EventBus
-*❗️해당 기능은 Vue 2까지만 지원되며, Vue3부터 Event Bus(+$on, $off, $once) 공식적으로 삭제* <br/>
+*❗️해당 기능은 Vue2까지만 지원되며, Vue3부터 Event Bus(+$on, $off, $once) 공식적으로 삭제* <br/>
 *Vue3에서 사용을 위해서는 mitt 라이브러리 사용이 필요* <br/>
 <br/>
 ⇒ 해당 기능 대신 Vuex 사용 가능
