@@ -64,7 +64,7 @@ app.use(router)
 State(상태)의 집합.  <br/>
 단일 상태 트리를 사용. 즉 App 1개 당 1개의 store만 갖고 있으며, State에 있는 state들은 복수의 컴포넌트에서 사용되어도 동일한 상태가 유지됨. 따라서 현재 state의 상태(snapshot)을 찾기 쉬움. <br/>
 * **mapState** <br/>
-    - 사용 이유: computed 속성을 통해 store의 state 값이 변경될 때마다 그 값을 화면에 출력하도록 할 수 있는데, computed에 선언된 state가 많으면 코드가 반복적이게 될 수 있음. 이런 불필요한 반복을 처리하기 위해 mapState helper를 이용함.
+    - 사용 이유: computed 속성을 통해 store의 state 값이 변경될 때마다 그 값을 화면에 출력하도록 할 수 있는데, computed에 선언된 state가 많으면 코드가 반복적이게 될 수 있음. 이런 불필요한 반복을 처리하기 위해 mapState 헬퍼를 이용함.
     - 예시 <br/>
     ```$store.state.count``` 의 변경된 값을 감지하고 싶을 때
     
@@ -99,7 +99,7 @@ State(상태)의 집합.  <br/>
         }
         ```
 
-#### ➿ **Actions**
+#### ➿ **Getters**
 store 내부의 계산 속성. <br/> 
 각각의 컴포넌트에서 state를 계산하면 반복 호출이 잦아져 비효율적인 로직이 됨. 따라서 store 내부에서 계산을 진행하고, 각 컴포넌트에서는 state만 호출하도록 하는 것.
 - ```this.$store.getters.{getter명}```의 형태로 활용
@@ -154,10 +154,10 @@ mapState와 동일하게 코드의 반복을 막기 위해 mapGetters 사용하�
     ```javascript
     computed: {
         ...mapGetters([
-        'increaseCount',
-        'anotherGetter',
-         count: 'decreaseCount' // this.count에 $store.getters.decreaseCount를 매핑하는 경우
-        // ...
+            'increaseCount',
+            'anotherGetter',
+            count: 'decreaseCount' // this.count에 $store.getters.decreaseCount를 매핑하는 경우
+            // ...
         ])
     }
     ```
@@ -401,9 +401,197 @@ Vuex 내부의 state의 값을 _비동기적으로_ 변경할 때 사용<br/>
     ```
 
 #### ➿ **Modules**
+저장소의 규모가 커지면 관리가 힘들기 때문에 각각 state, mutation, getters, actions를 포함하는 여러 개의 저장소로 나누어서 모듈화 할 수 있음
+```javaScript
+const moduleA = {
+  state: () => ({ ... }),
+  mutations: { ... },
+  actions: { ... },
+  getters: { ... }
+}
+
+const moduleB = {
+  state: () => ({ ... }),
+  mutations: { ... },
+  actions: { ... }
+}
+
+const store = new Vuex.Store({
+  modules: {
+    a: moduleA,
+    b: moduleB
+  }
+})
+
+store.state.a // -> moduleA'의 상태
+store.state.b // -> moduleB'의 상태
+```
+이때, 기존에 getters와 mutations의 첫 번째 파라미터였던 states는 각 module의 지역 상태(즉 module의 state)가 됨. rootState는 세 번째 파라미터에 표현되며, ```context.rootState```로 표현됨
+```javaScript
+const moduleA = {
+  state: () => ({
+    count: 0
+  }),
+  mutations: {
+    increment (state) {
+      // moduleA의 state
+      state.count++
+    }
+  },
+  getters: {
+    doubleCount (state) {
+      return state.count * 2
+    },
+    // 전역 상태의 state는 rootState.[변수명]
+    sumWithRootCount (state, getters, rootState) { 
+      return state.count + rootState.count
+    }
+  },
+  actions: { 
+    incrementIfOddOnRootSum ({ state, commit, rootState }) { // 전역 상태의 state는 rootState.[변수명]
+      if ((state.count + rootState.count) % 2 === 1) {
+        commit('increment')
+      }
+    }
+  }
+}
+```
+* 네임스페이스 <br/>
+모듈 내의 action, mutation, getter는 기본적으로 전역 네임스페이스 하에 등록됨. 그런데 다른 모듈 내부에 같은 이름의 메소드가 존재하면 충돌이 발생할 수 있음. 이를 예방하고자 ```namespaced:true```라는 옵션을 추가함으로써 store 요소들을 호출할 때 모듈 명을 앞에 붙여 호출할 수 있음. <br/>
+<br/>
+만약 전역 네임스페이스의 action을 dispatch 혹은 mutation을 commit 하고 싶다면 dispatch와 commit의 3번째 인자로 ```{ root: true }```를 전달.
+    ```javaScript
+    modules: {
+        foo: {
+            namespaced: true,
+            getters: {
+                // 해당 모듈의 지역화된 getters
+                // 4번째 인자를 통해서 rootGetters 사용 가능
+                someGetter (state, getters, rootState, rootGetters) {
+                    getters.someOtherGetter // -> 'foo/someOtherGetter'
+                    rootGetters.someOtherGetter // -> 'someOtherGetter'
+                },
+                someOtherGetter: state => { ... }
+            },
+            actions: {
+                // dispatch와 commit도 해당 모듈의 지역화된 것
+                // 전역 dispatch와 commit을 위한 `root` 옵션 설정 가능
+                someAction ({ dispatch, commit, getters, rootGetters }) {
+                    getters.someGetter // -> 'foo/someGetter'
+                    rootGetters.someGetter // -> 'someGetter'
+
+                    dispatch('someOtherAction') // -> 'foo/someOtherAction'
+                    dispatch('someOtherAction', null, { root: true }) // -> 'someOtherAction'
+
+                    commit('someMutation') // -> 'foo/someMutation'
+                    commit('someMutation', null, { root: true }) // -> 'someMutation'
+                },
+                someOtherAction (ctx, payload) { ... }
+            }
+        }
+    }
+    ```
+
+* 네임스페이스 모듈에서 전역 액션 등록 <br/>
+네임스페이스 모듈에서 전역으로 사용가능한 모듈을 등록하기 위해서는 ```root: true```를 표시하고 ```handler``` 함수에 액션을 정의
+    ```javaScript
+    {
+    actions: {
+        someOtherAction ({dispatch}) {
+        dispatch('someAction') // someAction을 호출하면 foo 모듈의 someAction이 실행됨
+        }
+    },
+    modules: {
+        foo: {
+        namespaced: true,
+
+        actions: {
+            someAction: {
+            root: true,
+            handler (namespacedContext, payload) { ... } // -> 'someAction'
+            }
+        }
+        }
+    }
+    }
+    ```
+
+* 헬퍼에서 네임스페이스 바인딩 <br/>
+mapState, mapGetters, mapActions, mapMutations 헬퍼에서 네임스페이스 모듈을 컴포넌트에 바인딩 할 때 간소화하는 방법 <br/>
+    * 기존
+    ```javaScript
+    computed: {
+        ...mapState({ // state.some.nested.module이 반복됨
+                a: state => state.some.nested.module.a,
+                b: state => state.some.nested.module.b
+            })
+        },
+        methods: {
+        ...mapActions([ // some/nested/module이 반복됨
+            'some/nested/module/foo', // -> this['some/nested/module/foo']()
+            'some/nested/module/bar' // -> this['some/nested/module/bar']()
+        ])
+    }
+    ```
+
+    * 모듈의 네임스페이스 문자열을 헬퍼의 첫 번째 인수로 전달하여 해당 모듈을 컨텍스트로 사용하여 바인딩
+    ```javaScript
+    computed: {
+        ...mapState('some/nested/module', {
+            a: state => state.a,
+            b: state => state.b
+        })
+    },
+    methods: {
+        ...mapActions('some/nested/module', [
+            'foo', // -> this.foo()
+            'bar' // -> this.bar()
+        ])
+    }
+    ```
+
+    * createNamespacedHelpers를 사용하여 네임스페이스 헬퍼 생성
+    ```javaScript
+    import { createNamespacedHelpers } from 'vuex'
+
+    const { mapState, mapActions } = createNamespacedHelpers('some/nested/module')
+
+    export default {
+        computed: {
+            // `some/nested/module`에서 찾음
+            ...mapState({
+                a: state => state.a,
+                b: state => state.b
+            })
+        },
+        methods: {
+            // `some/nested/module`에서 찾음
+            ...mapActions([
+                'foo',
+                'bar'
+            ])
+        }
+    }
+    ```
+
+    * 동적 모듈 등록 <br/>
+    저장소가 생성 된 후에 동적으로 모듈 등록
+    ```javaScript
+    store.registerModule('myModule', {
+        // ...
+    })
+
+    // `nested/myModule` 중첩 모듈 등록
+    store.registerModule(['nested', 'myModule'], {
+        // ...
+    })
+    ```
+    ```store.unregisterModule(moduleName)``` 를 사용하면 동적으로 등록한 모듈을 제거 가능. 단, 정적으로 등록된 모듈은 제거 불가.
 
 <br/>
 
+
+<br/>
 ❗️ Vuex는 새로고침 시 초기화 됨. 그러나 vuex-persistedstate (state - localstorage 동기화 라이브러리) 사용 시 브라우저의 local storage에 저장되어 새로고침해도 초기화되지 않음.
 
 <br/>
