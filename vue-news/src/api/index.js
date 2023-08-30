@@ -8,16 +8,28 @@ const config = {
 
 // 2. API 함수들 정리
 function fetchNewsList() {
-    // return axios.get(config.baseUrl + 'news/1.json');
-    return axios.get(`${config.baseUrl}news/1.json`)   //ES6 문법
+    try{ 
+        // return axios.get(config.baseUrl + 'news/1.json');
+        return axios.get(`${config.baseUrl}news/1.json`)   //ES6 문법
+    } catch (err) {
+        console.log('fetchNewsList Err: ', err)
+    }
 }
 
 function fetchJobsList() {
-    return axios.get(`${config.baseUrl}jobs/1.json`)
+    try {
+        return axios.get(`${config.baseUrl}jobs/1.json`)
+    } catch {
+        console.log('fetchJobsList Err: ', err)
+    }
 }
 
 function fetchAskList() {
-    return axios.get(`${config.baseUrl}ask/1.json`)
+    try {
+        return axios.get(`${config.baseUrl}ask/1.json`)
+    } catch {
+        console.log('fetchAskList Err: ', err)
+    }
 }
 
 function fetchUserInfo(userName) {

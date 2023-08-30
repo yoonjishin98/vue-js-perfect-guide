@@ -1,6 +1,7 @@
 import { fetchNewsList, fetchAskList, fetchJobsList, fetchUserInfo, fetchItemInfo, fetchList } from '../api/index.js'
 
 export default {
+    // PROMISE 를 사용한 구현
     // FETCH_NEWS(context) {
     //     fetchNewsList()
     //         .then(response => {     // 기존 Javacript 문법
@@ -11,6 +12,15 @@ export default {
     //             console.log('news error')
     //         })
     // },
+    // ASYNC AWAIT를 사용한 구현
+    async FETCH_NEWS({ commit }) {
+        const response = await fetchNewsList() 
+        commit('SET_NEWS', response.data)
+
+        return response
+    },
+
+    // PROMISE 를 사용한 구현
     // FETCH_JOBS({ commit }) {
     //     fetchJobsList()
     //         .then(({ data }) => {   // Destructing 문법
@@ -20,6 +30,15 @@ export default {
     //             console.log('jobs error')
     //         })
     // },
+    // ASYNC AWAIT를 사용한 구현
+    async FETCH_JOBS({ commit }) {
+        const response = await fetchJobsList()
+        commit('SET_JOBS', response.data)
+
+        return response
+    },
+
+    // PROMISE 를 사용한 구현
     // FETCH_ASK({ commit }) {
     //     fetchAskList()
     //         .then(({ data }) => {
@@ -29,6 +48,25 @@ export default {
     //             console.log('ask error')
     //         })
     // },
+    // ASYNC AWAIT를 사용한 구현
+    async FETCH_ASK({ commit }) {
+        const response = await fetchAskList()
+        commit('SET_ASK', response.data)
+        
+        return response
+    },
+    
+    
+    // FETCH_ASK({ commit }) {
+    //     fetchAskList()
+    //         .then(({ data }) => {
+    //             commit('SET_ASK', data)
+    //         })
+    //         .catch(error => {
+    //             console.log('ask error')
+    //         })
+    // },
+    
     FETCH_USER({ commit }, name) {
         fetchUserInfo(name)
             .then(({ data }) => {
